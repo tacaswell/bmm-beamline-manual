@@ -13,11 +13,12 @@ Beamline automation
 ===================
 
 .. caution:: Spreadsheets with version number earlier than 13 **will not
-	     work** as of 1 March, 2024.
+	     work** as of 1 March, 2024.  Grid spreadsheets changed
+	     significantly between 16 and 17.
 
 
 
-BMM currently supports five categories of spreadsheet-based automation:
+BMM currently supports six categories of spreadsheet-based automation:
 
 #. Sample wheels (|download| `spreadsheet
    <https://github.com/NSLS2/bmm-profile-collection/blob/main/startup/xlsx/wheel.xlsx>`__)
@@ -27,8 +28,11 @@ BMM currently supports five categories of spreadsheet-based automation:
    <https://github.com/NSLS2/bmm-profile-collection/blob/main/startup/xlsx/lakeshore.xlsx>`__)
 #. Glancing angle stage (|download| `spreadsheet
    <https://github.com/NSLS2/bmm-profile-collection/blob/main/startup/xlsx/glancing_angle.xlsx>`__)
-#. Generic XY and XYZ grids (|download| `spreadsheet
+#. Generic motor grids (|download| `spreadsheet
    <https://github.com/NSLS2/bmm-profile-collection/blob/main/startup/xlsx/grid.xlsx>`__)
+#. Resonant relfectivity (|download| `spreadsheet
+   <https://github.com/NSLS2/bmm-profile-collection/blob/main/startup/xlsx/reflectivity.xlsx>`__)
+   (This is a work in progress.)
 
 The latest spreadsheets for each of these can always be found at
 https://github.com/NSLS2/bmm-profile-collection/tree/main/startup/xlsx
@@ -40,20 +44,22 @@ differences in the columns corresponding to the different instruments.
 .. _fig-wheel-spreadsheet:
 .. figure:: _images/spreadsheets/wheel_spreadsheet.png
    :target: _images/wheel_spreadsheet.png
-   :width: 70%
+   :width: 90%
    :align: center
 
-   Example spreadsheet for running an experiment from a wheel with a
-   single sample ring.
+   Example spreadsheet for running an experiment on an *ex situ*
+   sample wheel.
 
-Make sure you are using the most up-to-date version of the spreadsheet.
+Always use the most up-to-date version of the spreadsheet from one of
+the links above.
 
-.. note:: The current spreadsheet version is **15**, as of 30
-          January, 2025.  You should *always* use a current
+.. note:: The current spreadsheet version is **17**, as of 7
+          July, 2025.  You should *always* use a current
           spreadsheet.
 
 .. caution:: Spreadsheets with version number earlier 13 **will not
-	     work** as of 1 March, 2024.
+	     work** as of 1 March, 2024.  Grid spreadsheets changed
+	     significantly between 16 and 17.
 
 
 Common features
@@ -76,24 +82,37 @@ For each individual measurement:
 + If a white cell is filled in, that value will be used for that
   measurement.
 
+Some columns do not use the green default line:
+
++ The filename must be explicitly specified.  A blank filename cell is
+  interpreted as a row to be skipped.
++ Motor columns, if used, must be filled in.  A blank cell means not
+  to move that motor.  Motor columns indicate that the green cell is
+  ignored by displaying a bold X through the green cell, as shown in 
+  :numref:`Figure %s <fig-motor_columns>`.
+
+.. _fig-motor_columns:
+.. figure:: _images/spreadsheets/motor_columns.png
+   :target: _images/motor_columns.png
+   :width: 75%
+   :align: center
+
+   Motor columns in spreadsheets show that the green cell is not used
+   by displaying a bold X through the green cells in those
+   columns. This example is from the grid spreadsheet.
+
+
+
 Experimenters
 ~~~~~~~~~~~~~
 
 .. note::
 
    As of summer 2024, with the implementation of data security, the
-   beamline now has access to some information about the proposal and
-   SAF.  It is no longer necessary to specify the names of the
+   beamline now has access to information from the proposal and SAF.
+   It is no longer necessary to specify the names of the
    experimenters.  All names on the proposal will be put in the
    metadata of every scan.
-
-..
-  The other green part of the spreadsheet is a cell for entering the
-  names of all the experimenters involved in the measurement.
-
-  This should **always** be filled in.  Doing so allows for the
-  possibility of searching BMM's master database for data associated
-  with a particular user.
 
 .. _spreadsheet_options:
 
@@ -101,8 +120,10 @@ Measurement options
 ~~~~~~~~~~~~~~~~~~~
 
 Beneath the experimenter cell, there are three drop-down menus for
-setting aspects of the sequence of measurements described on the
-spreadsheet tab.
+setting aspects of the sequence of measurements described in the
+spreadsheet.  These are shown in :numref:`Figure %s
+<fig-measurement_options>`.
+
 
 #. A yes/no menu for telling Bluesky to close the shutter at the end
    of the measurement sequence.
@@ -117,12 +138,27 @@ spreadsheet tab.
    "repetitions", which specifies the number of repeated XAS scans of
    the sample in that row of the spreadsheet.  
 
+
+.. _fig-measurement_options:
+.. figure:: _images/spreadsheets/measurement_options.png
+   :target: _images/measurement_options.png
+   :width: 85%
+   :align: center
+
+   Measurement options at the top of the spreadsheet.
+
+
 Detector position
 ~~~~~~~~~~~~~~~~~
 
 On the right hand side of each spreadsheet, there is a column for
-specifying the position of the fluorescence detector.  A smaller value
-is closer to the sample.
+specifying the position of the fluorescence detector.  See
+:numref:`Figure %s <fig-motor_columns>` for an example from the grid
+spreadsheet.
+
+A smaller value is closer to the sample.
+
+The fully retracted position is 205.
 
 The detector position is set on a sample-by-sample basis, allowing the
 best possible measurement |nd| not saturating the detector while
@@ -140,18 +176,38 @@ specifying specific positions for sample X and Y and for slit width
 and height.  This allows you to fine tune the sample position and beam
 size on a per-sample basis.
 
-The motor grid spreadsheet offers three columns for specifying motor
-positions.  The motors associated with those columns are
-user-select-able.  In this way, a grid over any beamline motor can
-programmed. 
+Some notes about how motors are interpreted for specific spreadsheet
+types.
 
-The glancing angle spreadsheet has the columns for specifying slit
-width and height.  It also has columns for specifying sample Y and
-pitch (X and pitch when in perpendicular mode) when manual alignment
-rather than automated alignment is selected.  There is no column for
-specifying the X position (or Y when in perpendicular mode) as use of
-the glancing angle stage presumes that all the samples are mounted at
-the centers of the spinners.
+:motor grid: The motor grid spreadsheet offers five columns for
+	     specifying motor positions.  Two of them are mandatory,
+	     three are optional and may be specified as "none".  
+
+	     The motors associated with those columns are specified by
+	     the user.  The column headings |nd| row 5 |nd| are drop
+	     down menus. The two mandatory columns |nd| R and S |nd|
+	     can be any xafs stage except for the rotation stages for
+	     the *ex situ* sample wheel, the glancing angle rotation
+	     stage, or the reference wheel.
+
+	     Those three rotary stages can be selected as optional
+	     motors.  For ``xafs_wheel`` or ``xafs_ref``, the value
+	     should be an integer between 1 and 24.  For
+	     ``xafs_garot``, the value should be an integer betwene 1
+	     and 8.  Any other value for these motors will fail with
+	     an error message.
+
+	     In this way, a grid of 2 to 5 motors can programmed.
+
+:glancing angle: The glancing angle spreadsheet has the columns for
+		 specifying slit width and height.  It also has
+		 columns for specifying sample Y and pitch (X and
+		 pitch when in perpendicular mode) when manual
+		 alignment rather than automated alignment is
+		 selected.  There is no column for specifying the X
+		 position (or Y when in perpendicular mode) as use of
+		 the glancing angle stage presumes that all the
+		 samples are mounted at the centers of the spinners.
 
 
 .. _xlsx:
@@ -164,8 +220,8 @@ spreadsheets are self-identifying.  Every spreadsheet has an
 identifying string spanning cells B1:C1.  This is the cell with the
 pink background.  
 
-.. caution:: **Never** change the text in the pink cell or your
-             spreadsheet will likely be interpreted incorrectly.
+.. danger:: **Never** change the text in the pink cell or your
+            spreadsheet will likely be interpreted incorrectly.
 
 Import a spreadsheet
 ~~~~~~~~~~~~~~~~~~~~
@@ -562,14 +618,8 @@ Motor grid automation
 
 The final kind of automation-via-spreadsheet available is BMM is for a
 generic motor grid.  The most common motor grid used for measurement
-is the sample XY stage, ``xafs_x`` and ``xafs_y``.  However, any two
-motors on the beamline can be used for the grid.
-
-There are columns (to the left of the view shown in :numref:`Figure %s
-<fig-grid-spreadsheet>`) for specifying the axes in the grid.
-
-In all other ways |nd| except for the ``slot`` column |nd| this
-spreadsheet is identical to the *ex situ* sample wheel spreadsheet.
+is the sample XY stage, ``xafs_x`` and ``xafs_y``.  However, most any
+xafs stage can be used for the grid.
 
 .. _fig-grid-spreadsheet:
 .. figure:: _images/spreadsheets/grid_spreadsheet.png
@@ -582,6 +632,49 @@ spreadsheet is identical to the *ex situ* sample wheel spreadsheet.
    <https://github.com/NSLS2/bmm-profile-collection/blob/main/startup/xlsx/grid.xlsx>`_.
 
 
+The columns in :numref:`Figure %s <fig-motor_columns>` |nd| to the
+left of the view shown in :numref:`Figure %s <fig-grid-spreadsheet>`
+|nd| are used to specify the axes in the grid.
+
+The motors are identified by a drop down selection in the header cells
+in row 5.
+
+The first two motor columns are mandatory and must be selected.  These
+can be any motors *except for* the *ex situ* sample wheel
+(``xafs_wheel``), the glancing angle rotary stage (``xafs_garot``), or
+the reference wheel (``xafs_ref``).
+
+The three optional motors can be any stage, including the three rotary
+stages.  Some details about the optional motors:
+
++ If ``none`` is selected from those drop-down menus, then that
+  motor is not included in the automation.
+
++ If ``xafs_wheel`` or ``xafs_ref`` is selected, the value should be
+  an integer between 1 and 24.  Any other value will trigger an error.
+
++ If ``xafs_garot`` is selected, the value should be an integer
+  between 1 and 8.  Any other value will trigger an error.
+
+
+.. todo:: What about ``xafs_refx`` when using ``xafs_ref``?  Maybe
+	  ``xafs_ref`` could take values like "4i" and "12o"?  Maybe
+	  exclude the ``xafs_refN`` stages entirely from the
+	  automation?
+
+In most ways |nd| the ``slot`` column being the notable exception |nd|
+this spreadsheet is identical to the *ex situ* sample wheel
+spreadsheet.
+
+Resonant refectivity automation
+-------------------------------
+
+.. todo:: This is a work in progress
+
+
+Future developments
+-------------------
+
 .. admonition:: Future Tech!
 
    Spreadsheets for:
@@ -593,4 +686,7 @@ spreadsheet is identical to the *ex situ* sample wheel spreadsheet.
 
 
 .. caution:: Spreadsheets with version number earlier than 13 **will
-	     not work** as of 1 March, 2024.
+	     not work** as of 1 March, 2024.  Grid spreadsheets changed
+	     significantly between 16 and 17.
+
+

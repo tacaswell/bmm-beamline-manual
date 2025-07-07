@@ -33,12 +33,18 @@ numfig = True
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx_math_dollar', 'sphinx.ext.mathjax',
+extensions = ['sphinx_math_dollar',
+              'sphinx.ext.mathjax',
               'sphinx.ext.todo',
 ]
 extensions.extend([#'fix_equation_ref',
-    'sphinx_subfigure', 'numsec', 'figtable',
-    'singlehtml_toc', 'singletext', 'demeterdocs', 'appendix'
+    'sphinx_subfigure',
+    'numsec',
+    'figtable',
+    'singlehtml_toc',
+    'singletext',
+    'demeterdocs',
+    'appendix'
 ])
 
 #bibtex_bibfiles = ['references.bib']
