@@ -1086,10 +1086,11 @@ Starting the system
   by ``xf06bm-ioc1`` at ``/disk2`` on that machine.  That mount should
   happen at boot and be available as long as the Pilatus server is on
   the network.
++ Turn on the detector by clicking the switch on the back.
 + Start camserver on ``xf06bm-pilatus100k-651``.  This is done in a
   terminal by ``start-camserver``.
 + Start (or restart) the IOC on ``xf06bm-ioc1`` by doing ``dzdo
-  manage-iocs restart Pilatus100k``
+  manage-iocs restart Pilatus100K``
 
 Overview of file saving
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1268,39 +1269,44 @@ On ``xf06bm-ioc1``, restart the ``Pilatus100K`` IOC with
 
 You should be good to go.
 
-Time synchronization
-~~~~~~~~~~~~~~~~~~~~
+..
+  Time synchronization
+  ~~~~~~~~~~~~~~~~~~~~
 
-Although the Pilatus server is configured to use an NTP server, it is
-(as of April 2025) unable to connect.  As a result, the system time is
-likely to be quite wrong, possibly by several minutes.
+  .. note:: This was fixed May 2025 by setting the gateway to the
+     correct subnet on ``xf06bm-pilatus100k-651`` then restarting the
+     NTP server.
 
-The part of the IOC that moves images from ``/disk2`` and saves them
-on central storage either as HDF5 or tiff files requires that the
-system times on the two machines be no more than a few seconds apart.
+  Although the Pilatus server is configured to use an NTP server, it is
+  (as of April 2025) unable to connect.  As a result, the system time is
+  likely to be quite wrong, possibly by several minutes.
 
-To synchronize the system time on ``xf06bm-pilatus100k-651`` with
-``xf06bm-ioc1`` do this:
+  The part of the IOC that moves images from ``/disk2`` and saves them
+  on central storage either as HDF5 or tiff files requires that the
+  system times on the two machines be no more than a few seconds apart.
 
-#. On an ``xf06bm-ioc1`` command line, enter ``date``.  This will
-   print a string like so:
+  To synchronize the system time on ``xf06bm-pilatus100k-651`` with
+  ``xf06bm-ioc1`` do this:
 
-   .. code-block:: text
+  #. On an ``xf06bm-ioc1`` command line, enter ``date``.  This will
+     print a string like so:
 
-      Wed Apr  2 07:35:49 PM EDT 2025
+     .. code-block:: text
 
-   Copy that string.
+	Wed Apr  2 07:35:49 PM EDT 2025
 
-#. On a command line on ``xf06bm-pilatus100k-651``, do this command:
+     Copy that string.
 
-   .. code-block:: text
+  #. On a command line on ``xf06bm-pilatus100k-651``, do this command:
 
-      date -s "Wed Apr  2 07:35:49 PM EDT 2025"
+     .. code-block:: text
 
-   replacing that string with the correct date and time from
-   ``xf06bm-ioc1``.
+	date -s "Wed Apr  2 07:35:49 PM EDT 2025"
 
-That should do it.
+     replacing that string with the correct date and time from
+     ``xf06bm-ioc1``.
+
+     That should do it.
 
 
 .. _rack_cabinets:

@@ -23,6 +23,15 @@ pip or some other method:
 2. [sphinx-subfigure](https://github.com/sphinx-extensions2/sphinx-subfigure)
 3. [spinx-book-theme](https://github.com/executablebooks/sphinx-book-theme)
 
+## Hints
+
+To compile the manual on a machine with an externally managed python
+environment, you may need to use a python virtual environment.  After
+installing the dependencies into the venv, try something like this:
+
+     make SPHINXBUILD=./my-venv/bin/sphinx-build html
+
+
 ## A note about copyright
 
 This document and the BlueSky data collection profile it covers was
